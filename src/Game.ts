@@ -1,41 +1,8 @@
-import { getNewLocation, random } from "./helpers";
+import Cat from "./Cat";
 import { walls } from "./data";
-import { Point } from "./types";
+import { Entity, Point } from "./types";
 
-class Cat implements Point {
-  x: number;
-  y: number;
-  game: Game;
-
-  constructor(game: Game) {
-    this.game = game;
-    this.x = random(0, this.game.width);
-    this.y = random(0, this.game.height);
-  }
-
-  draw() {
-    this.game.ctx.fillStyle = "#CD5700";
-    this.game.ctx.fillRect(
-      this.x * this.game.tileSize,
-      this.y * this.game.tileSize,
-      this.game.tileSize,
-      this.game.tileSize
-    );
-  }
-
-  update() {
-    while (true) {
-      const candidate = getNewLocation(this);
-      if (!this.game.isColliding(candidate)) {
-        this.x = candidate.x;
-        this.y = candidate.y;
-        break;
-      }
-    }
-  }
-}
-
-export default class Game {
+export default class Game implements Entity {
   cats: Cat[] = [];
   ctx: CanvasRenderingContext2D;
   walls = walls;
