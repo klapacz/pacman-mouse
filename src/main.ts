@@ -27,7 +27,18 @@ type Cat = {
 const cats: Cat[] = [];
 
 const isColliding = (x: number, y: number) =>
-  walls[y][x] || cats.find((cat) => cat.x === x && cat.y === y);
+  x < 0 ||
+  y < 0 ||
+  x >= width ||
+  y >= height ||
+  walls[y][x] ||
+  cats.find((cat) => cat.x === x && cat.y === y);
+
+const random = (min: number, max: number) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+};
 
 const generateCats = () => {
   let end = 4;
@@ -44,13 +55,33 @@ const generateCats = () => {
   }
 };
 
-const random = (min: number, max: number) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+const getRandomArrayElement = <T>(arr: readonly T[]) =>
+  arr[Math.floor(Math.random() * arr.length)];
+
+const getNewLocation = (cat: Cat) => {
+  const direction = getRandomArrayElement(["x", "y"] as const);
+  const location = getRandomArrayElement([-1, 1] as const);
+  const clone = { ...cat };
+  clone[direction] += location;
+
+  return clone;
+};
+
+const update = () => {
+  for (const [i, cat] of cats.entries()) {
+    while (true) {
+      const { x, y } = getNewLocation(cat);
+      if (!isColliding(x, y)) {
+        cats[i] = { x, y };
+        break;
+      }
+    }
+  }
 };
 
 const draw = (ctx: CanvasRenderingContext2D) => {
+  update();
+
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, width * tileSize, height * tileSize);
 
@@ -63,6 +94,11 @@ const draw = (ctx: CanvasRenderingContext2D) => {
       }
     }
   }
+
+  for (const { x, y } of cats) {
+    ctx.fillStyle = "#CD5700";
+    ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+  }
 };
 
 canvas.width = width * tileSize;
@@ -72,7 +108,6 @@ document.body.appendChild(canvas);
 
 if (ctx) {
   generateCats();
-  console.log(cats);
   // draw(ctx);
   setInterval(() => draw(ctx), 500);
 }
