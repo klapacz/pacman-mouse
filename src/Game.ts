@@ -1,6 +1,39 @@
 import { getNewLocation, random } from "./helpers";
 import { walls } from "./data";
-import { Cat } from "./types";
+import { Point } from "./types";
+
+class Cat implements Point {
+  x: number;
+  y: number;
+  game: Game;
+
+  constructor(game: Game) {
+    this.game = game;
+    this.x = random(0, this.game.width);
+    this.y = random(0, this.game.height);
+  }
+
+  draw() {
+    this.game.ctx.fillStyle = "#CD5700";
+    this.game.ctx.fillRect(
+      this.x * this.game.tileSize,
+      this.y * this.game.tileSize,
+      this.game.tileSize,
+      this.game.tileSize
+    );
+  }
+
+  update() {
+    while (true) {
+      const candidate = getNewLocation(this);
+      if (!this.game.isColliding(candidate)) {
+        this.x = candidate.x;
+        this.y = candidate.y;
+        break;
+      }
+    }
+  }
+}
 
 export default class Game {
   cats: Cat[] = [];
@@ -20,34 +53,28 @@ export default class Game {
   }
 
   start() {
-    this.generateCats();
+    this.generate();
     setInterval(() => {
       this.update();
       this.draw();
     }, 500);
   }
 
-  isColliding = (x: number, y: number) =>
-    x < 0 ||
-    y < 0 ||
-    x >= this.width ||
-    y >= this.height ||
-    walls[y][x] ||
-    this.cats.find((cat) => cat.x === x && cat.y === y);
+  isColliding = (point: Point) =>
+    point.x < 0 ||
+    point.y < 0 ||
+    point.x >= this.width ||
+    point.y >= this.height ||
+    walls[point.y][point.x] ||
+    this.cats.find((cat) => cat.x === point.x && cat.y === point.y);
 
-  update = () => {
-    for (const [i, cat] of this.cats.entries()) {
-      while (true) {
-        const { x, y } = getNewLocation(cat);
-        if (!this.isColliding(x, y)) {
-          this.cats[i] = { x, y };
-          break;
-        }
-      }
+  update() {
+    for (const cat of this.cats) {
+      cat.update();
     }
-  };
+  }
 
-  draw = () => {
+  draw() {
     this.ctx.fillStyle = "#000";
     this.ctx.fillRect(
       0,
@@ -71,29 +98,24 @@ export default class Game {
       }
     }
 
-    for (const { x, y } of this.cats) {
-      this.ctx.fillStyle = "#CD5700";
-      this.ctx.fillRect(
-        x * this.tileSize,
-        y * this.tileSize,
-        this.tileSize,
-        this.tileSize
-      );
+    // draw cats
+    for (const cat of this.cats) {
+      cat.draw();
     }
-  };
+  }
 
-  generateCats = () => {
+  generate() {
+    // generate cats
     let end = 4;
     for (let i = 0; i < end; i++) {
-      const x = random(0, this.width);
-      const y = random(0, this.height);
+      const candidate = new Cat(this);
 
-      if (this.isColliding(x, y)) {
+      if (this.isColliding(candidate)) {
         end++;
         continue;
       }
 
-      this.cats.push({ x, y });
+      this.cats.push(candidate);
     }
-  };
+  }
 }
