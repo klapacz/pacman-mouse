@@ -1,14 +1,20 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@types/node': ^17.0.23
   typescript: ^4.5.4
   vite: ^2.8.0
 
 devDependencies:
+  '@types/node': 17.0.23
   typescript: 4.6.3
   vite: 2.8.6
 
 packages:
+
+  /@types/node/17.0.23:
+    resolution: {integrity: sha512-UxDxWn7dl97rKVeVS61vErvw086aCYhDLyvRQZ5Rk65rZKepaFdm53GeqXaKBuOhED4e9uWq34IC3TdSdJJ2Gw==}
+    dev: true
 
   /esbuild-android-64/0.14.28:
     resolution: {integrity: sha512-A52C3zq+9tNwCqZ+4kVLBxnk/WnrYM8P2+QNvNE9B6d2OVPs214lp3g6UyO+dKDhUdefhfPCuwkP8j2A/+szNA==}
