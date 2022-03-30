@@ -21,6 +21,7 @@ export default class Game implements Entity {
 
   start() {
     this.generate();
+
     setInterval(() => {
       this.update();
       this.draw();
@@ -42,6 +43,7 @@ export default class Game implements Entity {
   }
 
   draw() {
+    // clear
     this.ctx.fillStyle = "#000";
     this.ctx.fillRect(
       0,
